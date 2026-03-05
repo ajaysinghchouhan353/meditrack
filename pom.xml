@@ -20,6 +20,20 @@
     </properties>
 
     <dependencies>
+        <!-- SLF4J API (Logging Facade) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+
+        <!-- Logback Implementation for SLF4J -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.11</version>
+        </dependency>
+
         <!-- JUnit for testing (optional) -->
         <dependency>
             <groupId>junit</groupId>

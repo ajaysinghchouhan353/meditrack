@@ -8,6 +8,8 @@ import com.airtribe.meditrack.util.DateUtil;
 import com.airtribe.meditrack.util.IdGenerator;
 import com.airtribe.meditrack.util.Validator;
 import com.airtribe.meditrack.constants.AppointmentStatus;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.Optional;
  * Demonstrates notification of appointment events through NotificationService.
  */
 public class AppointmentService {
+    private static final Logger logger = LoggerFactory.getLogger(AppointmentService.class);
     private final DataStore<Appointment> appointmentStore;
     private final DoctorService doctorService;
     private final PatientService patientService;
@@ -43,6 +46,7 @@ public class AppointmentService {
     public Appointment bookAppointment(String doctorId, String patientId, 
                                        LocalDateTime appointmentDateTime, String reason)
             throws InvalidDataException, AppointmentNotFoundException {
+        logger.debug("Booking appointment: doctorId={}, patientId={}, dateTime={}", doctorId, patientId, appointmentDateTime);
         // Validate data
         Validator.validateOrThrow(Validator.isNotEmpty(doctorId), "Doctor ID cannot be empty");
         Validator.validateOrThrow(Validator.isNotEmpty(patientId), "Patient ID cannot be empty");
@@ -51,9 +55,11 @@ public class AppointmentService {
 
         // Verify doctor and patient exist
         if (!doctorService.getDoctorById(doctorId).isPresent()) {
+            logger.error("Doctor not found for appointment: id={}", doctorId);
             throw new AppointmentNotFoundException("Doctor not found with ID: " + doctorId);
         }
         if (!patientService.getPatientById(patientId).isPresent()) {
+            logger.error("Patient not found for appointment: id={}", patientId);
             throw new AppointmentNotFoundException("Patient not found with ID: " + patientId);
         }
 
@@ -68,6 +74,7 @@ public class AppointmentService {
         
         // Notify listeners of appointment booking (Observer Pattern)
         notificationService.notifyAppointmentBooked(appointment);
+        logger.info("Appointment booked successfully: id={}, doctor={}, patient={}", appointmentId, doctorId, patientId);
         
         return appointment;
     }
@@ -122,6 +129,7 @@ public class AppointmentService {
      * @return true if cancelled, false otherwise
      */
     public boolean cancelAppointment(String appointmentId) throws AppointmentNotFoundException {
+        logger.debug("Attempting to cancel appointment: id={}", appointmentId);
         Optional<Appointment> optionalAppointment = appointmentStore.findById(appointmentId);
         if (optionalAppointment.isPresent()) {
             Appointment appointment = optionalAppointment.get();
@@ -131,9 +139,11 @@ public class AppointmentService {
             // Notify listeners of cancellation (Observer Pattern)
             if (updated) {
                 notificationService.notifyAppointmentCancelled(appointment);
+                logger.info("Appointment cancelled successfully: id={}", appointmentId);
             }
             return updated;
         }
+        logger.error("Appointment not found for cancellation: id={}", appointmentId);
         throw new AppointmentNotFoundException("Appointment not found with ID: " + appointmentId);
     }
 
@@ -143,6 +153,7 @@ public class AppointmentService {
      * @return true if marked completed, false otherwise
      */
     public boolean markAppointmentCompleted(String appointmentId) throws AppointmentNotFoundException {
+        logger.debug("Attempting to mark appointment as completed: id={}", appointmentId);
         Optional<Appointment> optionalAppointment = appointmentStore.findById(appointmentId);
         if (optionalAppointment.isPresent()) {
             Appointment appointment = optionalAppointment.get();
@@ -152,9 +163,11 @@ public class AppointmentService {
             // Notify listeners of completion (Observer Pattern)
             if (updated) {
                 notificationService.notifyAppointmentCompleted(appointment);
+                logger.info("Appointment marked as completed: id={}", appointmentId);
             }
             return updated;
         }
+        logger.error("Appointment not found for completion: id={}", appointmentId);
         throw new AppointmentNotFoundException("Appointment not found with ID: " + appointmentId);
     }
 

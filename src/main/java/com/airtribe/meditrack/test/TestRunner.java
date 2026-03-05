@@ -1,5 +1,6 @@
 package com.airtribe.meditrack.test;
 
+import com.airtribe.meditrack.constants.AppointmentStatus;
 import com.airtribe.meditrack.entity.*;
 import com.airtribe.meditrack.service.AppointmentService;
 import com.airtribe.meditrack.service.DoctorService;
@@ -189,7 +190,7 @@ public class TestRunner {
             );
             appointmentService.cancelAppointment(apt.getId());
             Optional<Appointment> cancelled = appointmentService.getAppointmentById(apt.getId());
-            return cancelled.isPresent() && cancelled.get().getStatus().equals("CANCELLED");
+            return cancelled.isPresent() && cancelled.get().getStatus().equals(AppointmentStatus.CANCELLED);
         });
     }
 

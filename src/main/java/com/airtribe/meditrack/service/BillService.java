@@ -8,6 +8,9 @@ import com.airtribe.meditrack.util.DataStore;
 import com.airtribe.meditrack.util.IdGenerator;
 import com.airtribe.meditrack.util.Validator;
 import com.airtribe.meditrack.util.BillFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +19,7 @@ import java.util.Optional;
  * Demonstrates use of BillFactory and multiple BillingStrategy implementations.
  */
 public class BillService {
+    private static final Logger logger = LoggerFactory.getLogger(BillService.class);
     private final DataStore<Bill> billStore;
     private final AppointmentService appointmentService;
 
@@ -35,11 +39,13 @@ public class BillService {
      */
     public Bill createBill(String appointmentId, double consultationFee, String strategyType)
             throws AppointmentNotFoundException, InvalidDataException {
+        logger.debug("Creating bill: appointmentId={}, fee={}, strategy={}", appointmentId, consultationFee, strategyType);
         Validator.validateOrThrow(Validator.isNotEmpty(appointmentId), "Appointment ID cannot be empty");
         Validator.validateOrThrow(consultationFee > 0, "Consultation fee must be positive");
 
         Optional<Appointment> optionalAppointment = appointmentService.getAppointmentById(appointmentId);
         if (!optionalAppointment.isPresent()) {
+            logger.error("Appointment not found for billing: id={}", appointmentId);
             throw new AppointmentNotFoundException("Appointment not found with ID: " + appointmentId);
         }
 
@@ -54,6 +60,7 @@ public class BillService {
             appointment.getDoctorId(), consultationFee, billType);
         
         billStore.add(bill);
+        logger.info("Bill created successfully: id={}, amount={}, strategy={}", billId, String.format("%.2f", bill.getTotalAmount()), strategyType);
         return bill;
     }
 
@@ -176,12 +183,18 @@ public class BillService {
      * @return true if marked paid, false otherwise
      */
     public boolean markBillAsPaid(String billId) throws AppointmentNotFoundException {
+        logger.debug("Marking bill as paid: id={}", billId);
         Optional<Bill> optionalBill = billStore.findById(billId);
         if (optionalBill.isPresent()) {
             Bill bill = optionalBill.get();
             bill.markAsPaid();
-            return billStore.update(billId, bill);
+            boolean updated = billStore.update(billId, bill);
+            if (updated) {
+                logger.info("Bill marked as paid: id={}, amount={}", billId, String.format("%.2f", bill.getTotalAmount()));
+            }
+            return updated;
         }
+        logger.error("Bill not found when marking as paid: id={}", billId);
         throw new AppointmentNotFoundException("Bill not found with ID: " + billId);
     }
 

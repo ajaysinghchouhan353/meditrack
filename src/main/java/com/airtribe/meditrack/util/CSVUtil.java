@@ -4,6 +4,8 @@ import com.airtribe.meditrack.entity.Appointment;
 import com.airtribe.meditrack.entity.Bill;
 import com.airtribe.meditrack.entity.Doctor;
 import com.airtribe.meditrack.entity.Patient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -17,6 +19,7 @@ import java.util.List;
  * Utility class for CSV file operations.
  */
 public class CSVUtil {
+    private static final Logger logger = LoggerFactory.getLogger(CSVUtil.class);
     private CSVUtil() {
         // Private constructor to prevent instantiation
     }
@@ -27,6 +30,7 @@ public class CSVUtil {
      * @param doctors the list of doctors
      */
     public static void writeDoctorsToCSV(String filePath, List<Doctor> doctors) throws IOException {
+        logger.debug("Writing {} doctors to CSV file: {}", doctors.size(), filePath);
         try (PrintWriter writer = new PrintWriter(
                 new OutputStreamWriter(new FileOutputStream(filePath), StandardCharsets.UTF_8))) {
             writer.println("ID,Name,Email,Phone,Address,Specialty,License,Experience,Available");
@@ -37,6 +41,10 @@ public class CSVUtil {
                     doctor.getLicenseNumber(), doctor.getYearsOfExperience(),
                     doctor.isAvailable());
             }
+            logger.info("Successfully exported {} doctors to CSV: {}", doctors.size(), filePath);
+        } catch (IOException e) {
+            logger.error("Failed to write doctors to CSV file: {}", filePath, e);
+            throw e;
         }
     }
 

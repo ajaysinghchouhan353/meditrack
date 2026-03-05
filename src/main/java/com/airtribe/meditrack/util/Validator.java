@@ -1,12 +1,16 @@
 package com.airtribe.meditrack.util;
 
 import com.airtribe.meditrack.exception.InvalidDataException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.regex.Pattern;
 
 /**
  * Utility class for data validation.
  */
 public class Validator {
+    private static final Logger logger = LoggerFactory.getLogger(Validator.class);
     private static final Pattern EMAIL_PATTERN = 
         Pattern.compile("^[A-Za-z0-9+_.-]+@(.+)$");
     private static final Pattern PHONE_PATTERN = 
@@ -70,6 +74,7 @@ public class Validator {
     public static void validateOrThrow(boolean condition, String errorMessage) 
             throws InvalidDataException {
         if (!condition) {
+            logger.warn("Validation failed: {}", errorMessage);
             throw new InvalidDataException(errorMessage);
         }
     }

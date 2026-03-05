@@ -12,6 +12,8 @@ import com.airtribe.meditrack.service.DoctorService;
 import com.airtribe.meditrack.service.NotificationService;
 import com.airtribe.meditrack.service.PatientService;
 import com.airtribe.meditrack.util.DataStore;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -22,8 +24,11 @@ import java.util.Scanner;
 /**
  * Clean entry point for MediTrack.
  * Supports interactive menu mode and --demo mode.
+ * Integrated with SLF4J for comprehensive logging.
  */
 public class Main {
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
+
     private static DoctorService doctorService;
     private static PatientService patientService;
     private static AppointmentService appointmentService;
@@ -92,23 +97,23 @@ public class Main {
                         running = false;
                         break;
                     default:
-                        System.out.println("Invalid option.");
+                        logger.warn("Invalid option: " + choice);
                 }
             } catch (Exception ex) {
-                System.err.println("Operation failed: " + ex.getMessage());
+                logger.error("Operation failed: " + ex.getMessage(), ex);
             }
 
             System.out.println();
         }
 
         scanner.close();
-        System.out.println("Goodbye from MediTrack.");
+        logger.info("Application closed. Goodbye from MediTrack.");
     }
 
     private static void printBanner() {
-        System.out.println("========================================");
-        System.out.println("MEDITRACK - Clinic Management System");
-        System.out.println("========================================");
+        logger.info("========================================");
+        logger.info("MEDITRACK - Clinic Management System");
+        logger.info("========================================");
     }
 
     private static void printMainMenu() {
@@ -146,24 +151,28 @@ public class Main {
                 Doctor doctor = doctorService.registerDoctor(
                     name, email, phone, address, specialty, license, years
                 );
-                System.out.println("Registered: " + doctor);
+                logger.info("Doctor registered: " + doctor.getId() + ", Name: " + name);
                 break;
             case "2":
                 List<Doctor> doctors = doctorService.getAllDoctors();
                 if (doctors.isEmpty()) {
-                    System.out.println("No doctors found.");
+                    logger.info("No doctors found in the system.");
                 } else {
-                    doctors.forEach(System.out::println);
+                    doctors.forEach(d -> logger.info("Doctor: " + d));
                 }
                 break;
             case "3":
                 System.out.print("Doctor ID: ");
                 String doctorId = scanner.nextLine();
                 Optional<Doctor> d = doctorService.getDoctorById(doctorId);
-                System.out.println(d.map(Object::toString).orElse("Doctor not found."));
+                if (d.isPresent()) {
+                    logger.info("Doctor found: " + d.get());
+                } else {
+                    logger.warn("Doctor not found for ID: " + doctorId);
+                }
                 break;
             default:
-                System.out.println("Invalid doctor menu option.");
+                logger.warn("Invalid doctor menu option: " + choice);
         }
     }
 
@@ -191,24 +200,28 @@ public class Main {
                 Patient patient = patientService.registerPatient(
                     name, email, phone, address, dob, gender, bloodGroup
                 );
-                System.out.println("Registered: " + patient);
+                logger.info("Patient registered: " + patient.getId() + ", Name: " + name);
                 break;
             case "2":
                 List<Patient> patients = patientService.getAllPatients();
                 if (patients.isEmpty()) {
-                    System.out.println("No patients found.");
+                    logger.info("No patients found in the system.");
                 } else {
-                    patients.forEach(System.out::println);
+                    patients.forEach(p -> logger.info("Patient: " + p));
                 }
                 break;
             case "3":
                 System.out.print("Patient ID: ");
                 String patientId = scanner.nextLine();
                 Optional<Patient> p = patientService.getPatientById(patientId);
-                System.out.println(p.map(Object::toString).orElse("Patient not found."));
+                if (p.isPresent()) {
+                    logger.info("Patient found: " + p.get());
+                } else {
+                    logger.warn("Patient not found for ID: " + patientId);
+                }
                 break;
             default:
-                System.out.println("Invalid patient menu option.");
+                logger.warn("Invalid patient menu option: " + choice);
         }
     }
 
@@ -227,34 +240,40 @@ public class Main {
                 System.out.print("Reason: ");
                 String reason = scanner.nextLine();
                 Appointment appointment = appointmentService.bookAppointment(doctorId, patientId, dateTime, reason);
-                System.out.println("Booked: " + appointment);
+                logger.info("Appointment booked: " + appointment.getId() + " for patient " + patientId);
                 break;
             case "2":
                 List<Appointment> allAppointments = appointmentService.getAllAppointments();
                 if (allAppointments.isEmpty()) {
-                    System.out.println("No appointments found.");
+                    logger.info("No appointments found in the system.");
                 } else {
-                    allAppointments.forEach(System.out::println);
+                    allAppointments.forEach(a -> logger.info("Appointment: " + a));
                 }
                 break;
             case "3":
                 System.out.print("Appointment ID: ");
                 String appointmentId = scanner.nextLine();
                 Optional<Appointment> ap = appointmentService.getAppointmentById(appointmentId);
-                System.out.println(ap.map(Object::toString).orElse("Appointment not found."));
+                if (ap.isPresent()) {
+                    logger.info("Appointment found: " + ap.get());
+                } else {
+                    logger.warn("Appointment not found for ID: " + appointmentId);
+                }
                 break;
             case "4":
                 System.out.print("Appointment ID to cancel: ");
-                appointmentService.cancelAppointment(scanner.nextLine());
-                System.out.println("Cancelled.");
+                String cancelId = scanner.nextLine();
+                appointmentService.cancelAppointment(cancelId);
+                logger.info("Appointment cancelled: " + cancelId);
                 break;
             case "5":
                 System.out.print("Appointment ID to complete: ");
-                appointmentService.markAppointmentCompleted(scanner.nextLine());
-                System.out.println("Marked completed.");
+                String completeId = scanner.nextLine();
+                appointmentService.markAppointmentCompleted(completeId);
+                logger.info("Appointment marked completed: " + completeId);
                 break;
             default:
-                System.out.println("Invalid appointment menu option.");
+                logger.warn("Invalid appointment menu option: " + choice);
         }
     }
 
@@ -271,37 +290,42 @@ public class Main {
                 System.out.print("Strategy (STANDARD/PREMIUM/DISCOUNTED/EMERGENCY): ");
                 String strategy = scanner.nextLine();
                 Bill bill = billService.createBill(appointmentId, fee, strategy);
-                System.out.println("Created: " + bill);
+                logger.info("Bill created: " + bill.getId() + " for appointment " + appointmentId + ", amount=" + String.format("%.2f", bill.getTotalAmount()));
                 break;
             case "2":
                 List<Bill> bills = billService.getAllBills();
                 if (bills.isEmpty()) {
-                    System.out.println("No bills found.");
+                    logger.info("No bills found in the system.");
                 } else {
-                    bills.forEach(System.out::println);
+                    bills.forEach(bl -> logger.info("Bill: " + bl));
                 }
                 break;
             case "3":
                 System.out.print("Bill ID: ");
                 String billId = scanner.nextLine();
                 Optional<Bill> b = billService.getBillById(billId);
-                System.out.println(b.map(Object::toString).orElse("Bill not found."));
+                if (b.isPresent()) {
+                    logger.info("Bill found: " + b.get());
+                } else {
+                    logger.warn("Bill not found for ID: " + billId);
+                }
                 break;
             case "4":
                 System.out.print("Bill ID to mark as paid: ");
-                billService.markBillAsPaid(scanner.nextLine());
-                System.out.println("Marked paid.");
+                String paidId = scanner.nextLine();
+                billService.markBillAsPaid(paidId);
+                logger.info("Bill marked as paid: " + paidId);
                 break;
             case "5":
-                System.out.println("Total Revenue: " + String.format("%.2f", billService.calculateTotalRevenue()));
+                logger.info("Total Revenue: " + String.format("%.2f", billService.calculateTotalRevenue()));
                 break;
             default:
-                System.out.println("Invalid billing menu option.");
+                logger.warn("Invalid billing menu option: " + choice);
         }
     }
 
     private static void runDemo() {
-        System.out.println("\nRunning full demo...");
+        logger.info("Starting full demo mode...");
         try {
             Doctor doctor = doctorService.registerDoctor(
                 "Dr. Rajesh Kumar", "rajesh@hospital.com", "9876543210", "Mumbai", "Cardiology", "LIC001", 15
@@ -315,18 +339,17 @@ public class Main {
             );
             Bill bill = billService.createBill(appointment.getId(), 600.0, "STANDARD");
 
-            System.out.println("Doctor registered: " + doctor.getId());
-            System.out.println("Patient registered: " + patient.getId());
-            System.out.println("Appointment booked: " + appointment.getId());
-            System.out.println("Bill created: " + bill.getId() + ", amount=" + String.format("%.2f", bill.getTotalAmount()));
+            logger.info("Demo Operation: Doctor registered with ID: " + doctor.getId());
+            logger.info("Demo Operation: Patient registered with ID: " + patient.getId());
+            logger.info("Demo Operation: Appointment booked with ID: " + appointment.getId());
+            logger.info("Demo Operation: Bill created with ID: " + bill.getId() + ", amount=" + String.format("%.2f", bill.getTotalAmount()));
 
-            System.out.println("Summary");
-            System.out.println("Doctors: " + doctorService.getTotalDoctors());
-            System.out.println("Patients: " + patientService.getTotalPatients());
-            System.out.println("Appointments: " + appointmentService.getTotalAppointments());
-            System.out.println("Bills: " + billService.getTotalBills());
+            logger.info("Demo Summary - Doctors: " + doctorService.getTotalDoctors());
+            logger.info("Demo Summary - Patients: " + patientService.getTotalPatients());
+            logger.info("Demo Summary - Appointments: " + appointmentService.getTotalAppointments());
+            logger.info("Demo Summary - Bills: " + billService.getTotalBills());
         } catch (InvalidDataException | AppointmentNotFoundException ex) {
-            System.err.println("Demo failed: " + ex.getMessage());
+            logger.error("Demo failed with exception: " + ex.getMessage(), ex);
         }
     }
 }

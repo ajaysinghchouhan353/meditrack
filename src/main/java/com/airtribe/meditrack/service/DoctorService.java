@@ -6,6 +6,8 @@ import com.airtribe.meditrack.constants.Specialization;
 import com.airtribe.meditrack.util.DataStore;
 import com.airtribe.meditrack.util.IdGenerator;
 import com.airtribe.meditrack.util.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import java.util.Optional;
  * Service class for managing doctors.
  */
 public class DoctorService {
+    private static final Logger logger = LoggerFactory.getLogger(DoctorService.class);
     private final DataStore<Doctor> doctorStore;
 
     public DoctorService(DataStore<Doctor> doctorStore) {
@@ -34,12 +37,14 @@ public class DoctorService {
     public Doctor registerDoctor(String name, String email, String phoneNumber, String address,
                                  String specialty, String licenseNumber, int yearsOfExperience)
             throws InvalidDataException {
+        logger.debug("Registering doctor: name={}, email={}, specialty={}", name, email, specialty);
         validateDoctorData(name, email, phoneNumber, specialty, licenseNumber, yearsOfExperience);
 
         String doctorId = IdGenerator.generateDoctorId();
         Doctor doctor = new Doctor(doctorId, name, email, phoneNumber, address,
                 specialty, licenseNumber, yearsOfExperience);
         doctorStore.add(doctor);
+        logger.info("Doctor registered successfully: id={}, name={}", doctorId, name);
         return doctor;
     }
 
@@ -96,7 +101,14 @@ public class DoctorService {
      * @return true if deleted, false otherwise
      */
     public boolean deleteDoctor(String doctorId) {
-        return doctorStore.remove(doctorId);
+        logger.debug("Attempting to delete doctor: id={}", doctorId);
+        boolean deleted = doctorStore.remove(doctorId);
+        if (deleted) {
+            logger.info("Doctor deleted successfully: id={}", doctorId);
+        } else {
+            logger.warn("Failed to delete doctor: id={}", doctorId);
+        }
+        return deleted;
     }
 
     /**

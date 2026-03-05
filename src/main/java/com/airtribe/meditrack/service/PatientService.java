@@ -5,6 +5,8 @@ import com.airtribe.meditrack.exception.InvalidDataException;
 import com.airtribe.meditrack.util.DataStore;
 import com.airtribe.meditrack.util.IdGenerator;
 import com.airtribe.meditrack.util.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Optional;
  * Service class for managing patients.
  */
 public class PatientService {
+    private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
     private final DataStore<Patient> patientStore;
 
     public PatientService(DataStore<Patient> patientStore) {
@@ -34,12 +37,14 @@ public class PatientService {
     public Patient registerPatient(String name, String email, String phoneNumber, String address,
                                    LocalDate dateOfBirth, String gender, String bloodGroup)
             throws InvalidDataException {
+        logger.debug("Registering patient: name={}, email={}, gender={}, bloodGroup={}", name, email, gender, bloodGroup);
         validatePatientData(name, email, phoneNumber, gender, bloodGroup);
 
         String patientId = IdGenerator.generatePatientId();
         Patient patient = new Patient(patientId, name, email, phoneNumber, address,
                 dateOfBirth, gender, bloodGroup);
         patientStore.add(patient);
+        logger.info("Patient registered successfully: id={}, name={}", patientId, name);
         return patient;
     }
 
@@ -96,7 +101,14 @@ public class PatientService {
      * @return true if deleted, false otherwise
      */
     public boolean deletePatient(String patientId) {
-        return patientStore.remove(patientId);
+        logger.debug("Attempting to delete patient: id={}", patientId);
+        boolean deleted = patientStore.remove(patientId);
+        if (deleted) {
+            logger.info("Patient deleted successfully: id={}", patientId);
+        } else {
+            logger.warn("Failed to delete patient: id={}", patientId);
+        }
+        return deleted;
     }
 
     /**
