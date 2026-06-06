@@ -174,7 +174,7 @@ meditrack/ (Root)
 │   │   ├── BillingStrategies.java         ├─ 4 concrete strategy implementations
 │   │   └── AIHelper.java                  └─ Optional AI features placeholder
 │   │
-│   ├── iface/                             ← Contracts (4 interfaces)
+│   ├── interfaces/                        ← Contracts (4 interfaces)
 │   │   ├── Searchable.java                ├─ ID-based search contract
 │   │   ├── Payable.java                   ├─ Payment operations contract
 │   │   ├── BillingStrategy.java           ├─ Strategy pattern contract
@@ -193,7 +193,7 @@ meditrack/ (Root)
 │   │   └── (reserved for future enums)
 │   │
 │   └── test/                              ← Test suite (1 class)
-│       └── TestRunner.java                └─ Manual tests (20+ test cases)
+│       └── TestRunner.java                └─ Manual tests (15 test cases)
 │
 ├── src/test/java/                         ← JUnit test directory (optional)
 │
