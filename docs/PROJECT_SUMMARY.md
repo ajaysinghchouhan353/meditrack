@@ -40,7 +40,7 @@ meditrack/
 │   │   ├── Bill.java                             (Implements Searchable, Payable)
 │   │   └── BillSummary.java                      (Immutable value object)
 │   │
-│   ├── iface/                                    ✅ Interfaces/Contracts
+│   ├── interfaces/                               ✅ Interfaces/Contracts
 │   │   ├── Searchable.java                       (ID-based searching)
 │   │   ├── Payable.java                          (Billing operations)
 │   │   ├── BillingStrategy.java                  (Strategy pattern for billing)
