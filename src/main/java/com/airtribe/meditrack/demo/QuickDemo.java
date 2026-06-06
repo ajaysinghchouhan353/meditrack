@@ -15,6 +15,7 @@ import com.airtribe.meditrack.util.DataStore;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import com.airtribe.meditrack.util.DateUtil;
 
 /**
  * Quick Demo - Minimal demonstration of core MediTrack features
@@ -71,7 +72,7 @@ public class QuickDemo {
                 "MED-98765",
                 12
             );
-            System.out.println("✓ Doctor registered: " + doctor.getName() + " (" + doctor.getSpecialty() + ")");
+            System.out.println("✓ Doctor registered: " + doctor.getName() + " (" + doctor.getSpecialty().getName() + ")");
             System.out.println("  Doctor ID: " + doctor.getId() + "\n");
             
             // Step 2: Register Patient
@@ -99,7 +100,7 @@ public class QuickDemo {
             );
             System.out.println("✓ Appointment booked");
             System.out.println("  Appointment ID: " + appointment.getId());
-            System.out.println("  Date/Time: " + appointmentTime);
+            System.out.println("  Date/Time: " + DateUtil.formatDateTime(appointmentTime));
             System.out.println("  Status: " + appointment.getStatus().getDescription() + "\n");
             
             // Step 4: Complete Appointment
@@ -120,7 +121,7 @@ public class QuickDemo {
             
             System.out.println("✓ Bill generated");
             System.out.println("  Bill ID: " + bill.getId());
-            System.out.println("  Strategy: " + bill.getBillingStrategy().getStrategyName());
+            System.out.println("  Strategy: " + (bill.getBillingStrategy() != null ? bill.getBillingStrategy().getStrategyName() : "STANDARD"));
             System.out.println("  Consultation Fee: ₹" + bill.getConsultationFee());
             System.out.println("  Lab Charges: ₹" + bill.getLabCharges());
             System.out.println("  Medicine Charges: ₹" + bill.getMedicineCharges());

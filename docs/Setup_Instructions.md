@@ -202,7 +202,7 @@ dir /a          # Windows (shows hidden files)
 
 # Expected top-level files and folders:
 # ├── src/
-# ├── docs/        (essential docs retained: Setup_Instructions.md, DEMO_OUTPUT.md, Design_Decisions.md)
+# ├── docs/        (essential docs retained: Setup_Instructions.md, Design_Decisions.md)
 # ├── pom.xml
 # ├── README.md
 # └── .gitignore
@@ -329,8 +329,8 @@ mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.test.TestRunner"
 =====================================
   TEST SUMMARY
 =====================================
-Total Tests: 15
-Passed: 15
+Total Tests: 18
+Passed: 18
 Failed: 0
 Success Rate: 100%
 ```

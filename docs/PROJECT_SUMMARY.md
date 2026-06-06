@@ -281,7 +281,7 @@ Build System: Maven 3.9+
 - ✅ **Data Persistence**: CSV export/import and Java serialization
 - ✅ **Validation Layer**: Comprehensive input validation
 - ✅ **Configuration Management**: Centralized app configuration
-- ✅ **Testing Infrastructure**: Manual test runner with 20+ test cases
+- ✅ **Testing Infrastructure**: Manual test runner with 18 test cases
 - ✅ **Observer Pattern**: Real-time notification system
 
 ### Advanced Java Features
@@ -305,7 +305,7 @@ Build System: Maven 3.9+
 - ✅ Date/Time Operations
 
 ### Testing
-- ✅ Manual Test Suite (20+ test cases)
+- ✅ Manual Test Suite (18 test cases)
 - ✅ Test Categories: Service, Utility, Validation
 - ✅ Custom Test Framework
 - ✅ JUnit Ready (Optional)
@@ -409,7 +409,7 @@ For complete demo documentation, see: `src/main/java/com/airtribe/meditrack/demo
 
 | Metric | Value |
 |--------|-------|
-| Total Java Files | 38 |
+| Total Java Files | 37 |
 | Classes | 28 |
 | Interfaces | 4 |
 | Enums | 3 |
@@ -418,7 +418,7 @@ For complete demo documentation, see: `src/main/java/com/airtribe/meditrack/demo
 | Lines of Code | ~3,200+ |
 | Documentation | 2,400+ lines |
 | Javadoc Coverage | ~90% |
-| Test Cases | 20+ |
+| Test Cases | 18 |
 | Design Patterns | 8+ |
 
 ---
@@ -643,7 +643,7 @@ Each file serves a specific purpose:
 2. ✅ **All Services Implemented** - Doctor, Patient, Appointment management
 3. ✅ **Utilities Complete** - Validation, ID generation, CSV, serialization
 4. ✅ **Exception Handling** - Custom exceptions for specific scenarios
-5. ✅ **Testing Framework** - Manual test runner with 20+ test cases
+5. ✅ **Testing Framework** - Manual test runner with 18 test cases
 6. ✅ **Maven Configuration** - Ready to build and deploy
 7. ✅ **Documentation** - multiple guides covering setup, design, verification, and troubleshooting
 8. ✅ **Examples** - Usage examples in Main and TestRunner

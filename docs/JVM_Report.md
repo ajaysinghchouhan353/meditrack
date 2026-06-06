@@ -37,7 +37,7 @@ java -Xms256m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+PrintGCDetails -
 ## Observations from Demo Runs
 
 - Both `QuickDemo` and `DemoRunner` execute quickly and show low memory pressure for modest datasets (dozens of entities).  
-- `TestRunner` observed 15/15 passing manual tests on the development machine.  
+-- `TestRunner` observed 18/18 passing manual tests on the development machine.  
 - Serialization and CSV export are the most time-consuming I/O operations (tens to hundreds of milliseconds depending on size).
 
 ---
@@ -74,7 +74,7 @@ java -Xms256m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+PrintGCDetails -
 
 ## Notes for Maintainers
 
-- The repository was streamlined: non-essential docs were pruned; essential docs remain in `docs/` (`Setup_Instructions.md`, `DEMO_OUTPUT.md`, `Design_Decisions.md`).  
+- The repository was streamlined: non-essential docs were pruned; essential docs remain in `docs/` (`Setup_Instructions.md`, `Design_Decisions.md`).  
 - Demo outputs and manual test runs are a quick smoke test before any production deployment.  
 
 ---

@@ -43,7 +43,7 @@ This document captures notable design decisions made while implementing MediTrac
 - Rationale: easy verification without a CI system; demos help reviewers quickly validate implemented features.
 
 ## 10. Documentation
-- Keep essential docs (`Setup_Instructions.md`, `DEMO_OUTPUT.md`, `Design_Decisions.md`) in `docs/`. Other in-depth docs were pruned to keep the repo focused.
+- Keep essential docs (`Setup_Instructions.md`, `Design_Decisions.md`) in `docs/`. Other in-depth docs were pruned to keep the repo focused.
 
 ## 11. Build & Tooling
 - Maven (`pom.xml`) manages build lifecycle. `maven-javadoc-plugin` is configured for JavaDoc generation.
