@@ -214,7 +214,7 @@ meditrack/ (Root)
 │   │   └── (reserved for future enums)
 │   │
 │   └── test/                              ← Test suite (1 class)
-│       └── TestRunner.java                └─ Manual tests (15 test cases)
+│       └── TestRunner.java                └─ Manual tests (18 test cases)
 │
 ├── src/test/java/                         ← JUnit test directory (optional)
 │
