@@ -2,9 +2,16 @@
 
 > A professional-grade **Clinic & Appointment Management System** demonstrating enterprise Java architecture, advanced OOP principles, design patterns, and modern Java 17 features.
 
-**Version**: 1.0.0 | **Java**: 17 LTS | **Status**: ✅ Production Ready | **Last Updated**: March 5, 2026
+**Version**: 1.0.0 | **Java**: 17 LTS | **Status**: ✅ Production Ready | **Last Updated**: June 6, 2026
 
 ---
+
+## 📝 Release Notes (June 6, 2026)
+
+- Version `1.0.0` release: core functionality implemented and verified.
+- Major updates: consolidated interface package (`com.airtribe.meditrack.interfaces`), added comprehensive demos, improved persistence and reporting.
+-- Demo output: run `com.airtribe.meditrack.demo.DemoRunner` locally to capture demo output (not included in repository).
+
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -97,11 +104,35 @@ mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.demo.DemoRunner"
 # 5. Run interactive menu
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main"
 
-# 6. Or run with demo mode
+# 6. Load saved data on startup
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--loadData"
+
+# 7. Or run with demo mode
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--demo"
 
-# 7. Run manual tests
+# 8. Run manual tests
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.test.TestRunner"
+```
+
+### Packaging (runnable fat JAR)
+
+Build an executable jar with dependencies (assembly):
+
+```bash
+# Produces: target/meditrack-1.0.0-jar-with-dependencies.jar
+mvn -q clean package assembly:single
+```
+
+Run the assembled JAR (demo mode):
+
+```bash
+java -jar target/meditrack-1.0.0-jar-with-dependencies.jar --demo
+```
+
+On Windows you can use the included `run-demo.bat` which builds the JAR if missing and runs the demo:
+
+```powershell
+.\run-demo.bat
 ```
 
 **Expected Output**:
@@ -164,7 +195,7 @@ meditrack/ (Root)
 │   │   ├── BillingStrategies.java         ├─ 4 concrete strategy implementations
 │   │   └── AIHelper.java                  └─ Optional AI features placeholder
 │   │
-│   ├── iface/                             ← Contracts (4 interfaces)
+│   ├── interfaces/                        ← Contracts (4 interfaces)
 │   │   ├── Searchable.java                ├─ ID-based search contract
 │   │   ├── Payable.java                   ├─ Payment operations contract
 │   │   ├── BillingStrategy.java           ├─ Strategy pattern contract
@@ -180,10 +211,10 @@ meditrack/ (Root)
 │   │   └── Specialization.java            └─ Medical specialization enum
 │   │
 │   ├── enums/                             ← Type-safe enums
-│   │   └── Specialization.java            └─ 8 medical specialties
+│   │   └── (reserved for future enums)
 │   │
 │   └── test/                              ← Test suite (1 class)
-│       └── TestRunner.java                └─ Manual tests (20+ test cases)
+│       └── TestRunner.java                └─ Manual tests (18 test cases)
 │
 ├── src/test/java/                         ← JUnit test directory (optional)
 │
@@ -191,13 +222,12 @@ meditrack/ (Root)
 │   ├── Setup_Instructions.md              ├─ Environment setup guide
 │   ├── JVM_Report.md                      ├─ JVM analysis & performance
 │   ├── Design_Decisions.md                ├─ Architecture decisions
-│   ├── README.md                          └─ Main documentation (legacy)
+│   ├── REQUIREMENTS_VERIFICATION.md       ├─ Requirements traceability
+│   ├── REQUIREMENTS_CHECKLIST.md          ├─ Quick validation checklist
+│   ├── RUNTIME_FIX_GUIDE.md               └─ Runtime troubleshooting
 │
 ├── pom.xml                                ← Maven configuration
 ├── README.md                              ← This file
-├── REQUIREMENTS_VERIFICATION.md           ← Detailed requirements analysis
-├── REQUIREMENTS_CHECKLIST.md              ← Quick verification checklist
-├── RUNTIME_FIX_GUIDE.md                   ← Troubleshooting guide
 └── .gitignore                             ← Git ignore rules
 
 Total: 35+ Java classes | ~2,500+ lines of code | 0 compile errors
@@ -364,9 +394,55 @@ reminderTimer.schedule(new TimerTask() { ... }, delay);
 | **Factory** | `BillFactory.java` | Create bills with appropriate strategies |
 | **Strategy** | `BillingStrategy.java` + 4 implementations | Multiple billing algorithms |
 | **Observer** | `NotificationService.java` | Notify listeners of appointment events |
-| **Template Method** | `MedicalEntity.java` | Common behavior in base class |
+| **Template Method** | `AbstractReportTemplate.java` | Common report workflow in base class |
 | **Generic Repository** | `DataStore<T>` | Type-safe data access |
 | **Service Layer** | `*Service.java` classes | Encapsulate business logic |
+
+---
+
+## 🧪 Testing
+
+- Automated tests (JUnit / Surefire):
+
+```bash
+# Run the automated test suite
+mvn -q clean test
+```
+
+- Manual test harness (`TestRunner`):
+
+```bash
+# Run the TestRunner via Maven exec (manual harness)
+mvn -Dexec.mainClass=com.airtribe.meditrack.test.TestRunner org.codehaus.mojo:exec-maven-plugin:3.1.0:java
+
+# Or run from the assembled fat JAR (recommended for repeatable runs)
+java -cp target/meditrack-1.0.0-jar-with-dependencies.jar com.airtribe.meditrack.test.TestRunner
+```
+
+- Current manual test results (last run): **18/18 passed**. The `TestRunner` file is `src/main/java/com/airtribe/meditrack/test/TestRunner.java`.
+
+---
+
+## 📚 Build & Documentation
+
+- Build and assemble a runnable JAR (with dependencies):
+
+```bash
+# Produces: target/meditrack-1.0.0-jar-with-dependencies.jar
+mvn -q clean package assembly:single
+```
+
+- JavaDoc (API docs):
+
+```bash
+# Generate JavaDoc site
+mvn javadoc:javadoc
+# View: target/site/apidocs/index.html
+```
+
+- Artifacts & helper scripts:
+    - `run-demo.bat` — Windows helper: builds the fat JAR if missing and runs demo (`--demo`).
+    - Assembled JAR: `target/meditrack-1.0.0-jar-with-dependencies.jar` (after assembly).
 
 ### Pattern Examples
 

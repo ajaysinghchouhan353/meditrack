@@ -1,7 +1,7 @@
 package com.airtribe.meditrack.service;
 
 import com.airtribe.meditrack.entity.Appointment;
-import com.airtribe.meditrack.iface.AppointmentListener;
+import com.airtribe.meditrack.interfaces.AppointmentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;

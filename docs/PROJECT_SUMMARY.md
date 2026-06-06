@@ -29,7 +29,7 @@ meditrack/
 │   │   └── Specialization.java                   ✅ Medical specialization enum
 │   │
 │   ├── enums/
-│   │   └── Specialization.java                   ✅ Alternative specialization enum
+│   │   └── (reserved for future enums)
 │   │
 │   ├── entity/                                   ✅ Domain models
 │   │   ├── MedicalEntity.java                    (Abstract base class)
@@ -40,7 +40,7 @@ meditrack/
 │   │   ├── Bill.java                             (Implements Searchable, Payable)
 │   │   └── BillSummary.java                      (Immutable value object)
 │   │
-│   ├── iface/                                    ✅ Interfaces/Contracts
+│   ├── interfaces/                               ✅ Interfaces/Contracts
 │   │   ├── Searchable.java                       (ID-based searching)
 │   │   ├── Payable.java                          (Billing operations)
 │   │   ├── BillingStrategy.java                  (Strategy pattern for billing)
@@ -87,8 +87,8 @@ meditrack/
 ├── .gitignore                                     ✅ Git ignore rules
 └── README.md                                      ✅ Main documentation
 
-Total Java Files: 38 classes/interfaces/enums (including demos)
-Total Documentation: 5 detailed guides (including demo README)
+Total Java Files: 37 classes/interfaces/enums (including demos)
+Total Documentation: 8 files (including demo README)
 Build System: Maven 3.9+
 ```
 
@@ -96,7 +96,7 @@ Build System: Maven 3.9+
 
 ## 📋 Files Created
 
-### Core Java Classes (38 files)
+### Core Java Classes (37 files)
 
 **Demo Files (2):**
 - ✅ `QuickDemo.java` - 60-second overview demonstration
@@ -115,7 +115,7 @@ Build System: Maven 3.9+
 **Constants & Enums (3):**
 - ✅ `Constants.java` - Application constants
 - ✅ `AppointmentStatus.java` - Appointment status enum (in constants/)
-- ✅ `Specialization.java` - Medical specialization enum (in constants/ and enums/)
+- ✅ `Specialization.java` - Medical specialization enum (in constants/)
 
 **Entities (7):**
 - ✅ `MedicalEntity.java` - Abstract base for medical entities
@@ -177,7 +177,7 @@ Build System: Maven 3.9+
 
 ### Documentation
 
-**4 Comprehensive Guides:**
+**Core Guides:**
 
 1. **README.md** (Main project documentation)
    - Project overview and introduction
@@ -213,6 +213,21 @@ Build System: Maven 3.9+
    - JIT compilation insights
    - Optimization recommendations
    - Monitoring tools guide
+
+5. **Design_Decisions.md** (Architecture decisions and trade-offs)
+   - Core architectural choices
+   - Persistence and cloning decisions
+   - Pattern usage notes
+
+6. **REQUIREMENTS_VERIFICATION.md** (Requirements traceability)
+   - Coverage checklist
+   - Scope notes
+
+7. **REQUIREMENTS_CHECKLIST.md** (Quick verification checklist)
+   - Implementation status at a glance
+
+8. **RUNTIME_FIX_GUIDE.md** (Runtime troubleshooting)
+   - Common issues and recovery commands
 
 **Configuration Files:**
 - ✅ `pom.xml` - Maven build configuration with Java 17, SLF4J/Logback dependencies
@@ -266,7 +281,7 @@ Build System: Maven 3.9+
 - ✅ **Data Persistence**: CSV export/import and Java serialization
 - ✅ **Validation Layer**: Comprehensive input validation
 - ✅ **Configuration Management**: Centralized app configuration
-- ✅ **Testing Infrastructure**: Manual test runner with 20+ test cases
+- ✅ **Testing Infrastructure**: Manual test runner with 18 test cases
 - ✅ **Observer Pattern**: Real-time notification system
 
 ### Advanced Java Features
@@ -290,7 +305,7 @@ Build System: Maven 3.9+
 - ✅ Date/Time Operations
 
 ### Testing
-- ✅ Manual Test Suite (20+ test cases)
+- ✅ Manual Test Suite (18 test cases)
 - ✅ Test Categories: Service, Utility, Validation
 - ✅ Custom Test Framework
 - ✅ JUnit Ready (Optional)
@@ -394,7 +409,7 @@ For complete demo documentation, see: `src/main/java/com/airtribe/meditrack/demo
 
 | Metric | Value |
 |--------|-------|
-| Total Java Files | 38 |
+| Total Java Files | 37 |
 | Classes | 28 |
 | Interfaces | 4 |
 | Enums | 3 |
@@ -403,7 +418,7 @@ For complete demo documentation, see: `src/main/java/com/airtribe/meditrack/demo
 | Lines of Code | ~3,200+ |
 | Documentation | 2,400+ lines |
 | Javadoc Coverage | ~90% |
-| Test Cases | 20+ |
+| Test Cases | 18 |
 | Design Patterns | 8+ |
 
 ---
@@ -508,7 +523,7 @@ com.airtribe.meditrack
 ├── exception/                   # Custom exceptions
 │   ├── AppointmentNotFoundException.java
 │   └── InvalidDataException.java
-├── iface/                       # Interface definitions
+├── interfaces/                  # Interface definitions
 │   ├── Searchable.java
 │   ├── Payable.java
 │   ├── BillingStrategy.java
@@ -628,9 +643,9 @@ Each file serves a specific purpose:
 2. ✅ **All Services Implemented** - Doctor, Patient, Appointment management
 3. ✅ **Utilities Complete** - Validation, ID generation, CSV, serialization
 4. ✅ **Exception Handling** - Custom exceptions for specific scenarios
-5. ✅ **Testing Framework** - Manual test runner with 20+ test cases
+5. ✅ **Testing Framework** - Manual test runner with 18 test cases
 6. ✅ **Maven Configuration** - Ready to build and deploy
-7. ✅ **Documentation** - 4 comprehensive guides (2,100+ lines)
+7. ✅ **Documentation** - multiple guides covering setup, design, verification, and troubleshooting
 8. ✅ **Examples** - Usage examples in Main and TestRunner
 9. ✅ **Design Patterns** - Multiple patterns demonstrated
 10. ✅ **SOLID Principles** - All 5 principles applied

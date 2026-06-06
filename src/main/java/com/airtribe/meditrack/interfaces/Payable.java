@@ -1,4 +1,4 @@
-package com.airtribe.meditrack.iface;
+package com.airtribe.meditrack.interfaces;
 
 /**
  * Payable interface for entities that can be paid.

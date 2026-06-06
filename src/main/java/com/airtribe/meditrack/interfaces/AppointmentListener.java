@@ -1,4 +1,4 @@
-package com.airtribe.meditrack.iface;
+package com.airtribe.meditrack.interfaces;
 
 import com.airtribe.meditrack.entity.Appointment;
 

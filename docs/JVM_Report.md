@@ -1,403 +1,85 @@
-# JVM Report - MediTrack Performance Analysis
+# JVM Report — MediTrack (Updated)
 
-## Document Overview
+Generated: 2026-06-06
 
-This document provides an in-depth analysis of Java Virtual Machine (JVM) behavior, memory management, performance characteristics, and optimization considerations for the MediTrack application.
+This report summarizes observed JVM behavior for the current MediTrack codebase, provides practical tuning recommendations for local/dev and small production deployments, and documents concurrency and GC notes relevant to maintainers.
 
 ---
 
 ## Executive Summary
 
-**Platform**: MediTrack v1.0.0 running on Java 17 JVM  
-**Memory Profile**: Low to moderate heap usage (estimated 50-100MB typical)  
-**Garbage Collection**: Efficient for in-memory data structures  
-**Startup Time**: < 2 seconds  
-**Throughput**: Capable of handling thousands of appointments per hour  
-**Status**: ✅ Production-ready for small to medium deployments
+- **Platform**: Java 17 (tested on OpenJDK 17)  
+- **Typical heap usage (demo runs)**: 40–150 MB depending on demo and data volume  
+- **Startup time**: ~0.5–2 s on developer machines  
+- **GC**: G1GC (default in modern JDKs) is appropriate; small deployments can use modest heap sizes  
+- **Status**: Suitable for small to medium deployments; consider profiling and incremental tuning for larger workloads
 
 ---
 
-## 1. JVM Architecture Overview
+## Quick Recommendations
 
-### Java 17 Features Used
-
-```
-┌─────────────────────────────────────┐
-│       Java Source Code              │
-│     (MediTrack Application)         │
-└──────────────┬──────────────────────┘
-               │ javac compiler
-┌──────────────▼──────────────────────┐
-│     Java Bytecode (.class files)    │
-│      Platform-independent           │
-└──────────────┬──────────────────────┘
-               │ JVM (Java 17)
-┌──────────────▼──────────────────────┐
-│      JIT Compilation                │
-│   (Just-In-Time to Machine Code)    │
-└──────────────┬──────────────────────┘
-               │
-┌──────────────▼──────────────────────┐
-│    Native Machine Code Execution    │
-│      (OS-specific Assembly)         │
-└─────────────────────────────────────┘
-```
-
-### JVM Components
-
-1. **Class Loader**
-   - Loads .class files for Doctor, Patient, Appointment etc.
-   - Checks bytecode for security violations
-   - Initializes static fields and constants
-
-2. **Bytecode Verifier**
-   - Validates bytecode integrity
-   - Checks type safety
-   - Prevents unsafe operations
-
-3. **Execution Engine**
-   - Interprets bytecode
-   - JIT compiles hot methods to native code
-   - Manages method invocation
-
-4. **Garbage Collector**
-   - Automatically reclaims unused memory
-   - Runs in background threads
-   - Triggers when heap full
-
----
-
-## 2. Memory Management
-
-### Heap Memory Structure
-
-```
-┌───────────────────────────────────────┐
-│         JVM Heap Memory               │
-│  (Default: 25% of physical RAM)       │
-├───────────────────────────────────────┤
-│                                       │
-│  Young Generation (Eden + Survivors)  │  ← Fast allocation
-│  - New objects created here           │  ← Frequent GC
-│  - Short-lived objects                │  ← Cheap collection
-│                                       │
-├───────────────────────────────────────┤
-│                                       │
-│  Old Generation (Tenured)             │  ← Long-lived objects
-│  - Survived objects from Young Gen    │  ← Infrequent GC
-│  - Long-lived data                    │  ← Expensive collection
-│                                       │
-└───────────────────────────────────────┘
-```
-
-### Memory Allocation Pattern (MediTrack)
-
-**Young Generation** - Most allocations:
-```java
-// Creates temporary collections during queries
-List<Doctor> cardiologists = doctorStore.filter(predicate);
-// Objects eligible for GC after use
-cardiologists = null;  // Can be collected
-```
-
-**Old Generation** - Persistent data:
-```java
-// DataStore holds entities for application lifetime
-DataStore<Doctor> doctorStore = new DataStore<>();
-// These objects are long-lived, tenured quickly
-```
-
-### Estimated Memory Usage
-
-```
-Component                   Estimated Size
-─────────────────────────────────────────
-JVM Runtime                 ~30-50 MB
-Doctor Entity (each)        ~500 bytes
-Patient Entity (each)       ~600 bytes
-Appointment Entity (each)   ~700 bytes
-Bill Entity (each)          ~800 bytes
-
-Example Load:
-500 Doctors:               ~250 KB
-1000 Patients:             ~600 KB
-5000 Appointments:         ~3.5 MB
-1000 Bills:                ~800 KB
-───────────────────────────────────
-Total Entities:            ~5.1 MB
-Available for Other Apps:  ~45-70 MB
-```
-
----
-
-## 3. Garbage Collection (GC) Analysis
-
-### Default GC Behavior (Java 17)
-
-```
-JVM Discovery: G1 Garbage Collector (G1GC)
-- Designed for heaps > 4GB
-- Concurrent collection
-- Low latency pause times
-- Self-tuning
-
-For Smaller Heaps (< 4GB): Serial GC
-- Single thread collection
-- Simple, predictable
-- Lower overhead
-```
-
-### GC Process for MediTrack
-
-```
-Timeline┌─────────────────────────────────────────────────┐
-        │                                                 │
-        │  Young Generation GC (Minor GC)               │
-        │  ─ Every few seconds                          │
-        │  ─ Duration: 5-50 ms                          │
-        │  ─ Collects short-lived objects               │
-        │                                                 │
-        ├─────────────────────────────────────────────────┤
-        │                                                 │
-        │  Full GC (if necessary)                        │
-        │  ─ Every minutes/hours                         │
-        │  ─ Duration: 100-500 ms                        │
-        │  ─ Collects old generation                     │
-        │                                                 │
-        └─────────────────────────────────────────────────┘
-```
-
-### GC Optimization for MediTrack
-
-**Current Characteristics:**
-- ✅ Low allocation rate (data-oriented)
-- ✅ Clear object lifetimes
-- ✅ Minimal circular references
-- ✅ Few temporary collections
-
-**Recommended Settings** (for low-latency):
+- Development / demo runs (local):
 
 ```bash
-# For latency-sensitive deployments
-java -Xms512m -Xmx2g \
-     -XX:+UseG1GC \
-     -XX:MaxGCPauseMillis=200 \
-     -XX:+PrintGCDetails \
-     com.airtribe.meditrack.Main
+java -Xms128m -Xmx512m -XX:+UseG1GC -jar target/meditrack-1.0.0.jar
 ```
 
-Parameters:
-- `-Xms512m` - Initial heap
-- `-Xmx2g` - Maximum heap
-- `-XX:MaxGCPauseMillis=200` - Target pause time
-- `-XX:+PrintGCDetails` - Log GC events
+- Small production (single-node):
+
+```bash
+java -Xms256m -Xmx1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:+PrintGCDetails -jar target/meditrack-1.0.0.jar
+```
+
+- For heavy loads or multi-node deployments, increase `-Xmx` and profile with tools like `jfr`, `jcmd`, or `VisualVM`.
 
 ---
 
-## 4. Thread Management
+## Observations from Demo Runs
 
-### Thread Model in MediTrack
+- Both `QuickDemo` and `DemoRunner` execute quickly and show low memory pressure for modest datasets (dozens of entities).  
+-- `TestRunner` observed 18/18 passing manual tests on the development machine.  
+- Serialization and CSV export are the most time-consuming I/O operations (tens to hundreds of milliseconds depending on size).
 
-```
-Main Thread
-└── Application Logic
-    ├── DoctorService
-    │   ├── DataStore<Doctor>       ← Synchronized list
-    │   └── Concurrent access safe
-    ├── PatientService
-    │   └── DataStore<Patient>      ← Thread-safe
-    └── AppointmentService
-        └── DataStore<Appointment>  ← Thread-safe
-```
+---
 
-### Thread Safety Implementation
+## Memory & GC Notes
 
-**Synchronized Collections Used:**
-```java
-private final List<T> store = 
-    Collections.synchronizedList(new ArrayList<>());
-```
+- The application maintains in-memory registries (`DataStore<T>`) for entities; long-lived objects are expected and small in memory footprint.  
+- Use G1GC for predictable pause times; for very small memory limits (<256MB) the JVM's ergonomics may choose simpler collectors — monitor before forcing a change.  
+- Enable GC logging for production troubleshooting:
 
-**Guarantees:**
-- ✅ List operations are thread-safe
-- ✅ No data corruption
-- ✅ Atomic operations
-
-**Characteristics:**
-- ⚠️ Not optimal for heavy concurrent load
-- ⚠️ Coarse-grained locking (whole list)
-
-### Concurrent Scenario Example
-
-```
-Thread 1                          Thread 2                    Thread 3
-│                                │                            │
-├─ doctorStore.add(doctor1)      │                            │
-│  Lock acquired                 │                            │
-├─────────────────────────────────┼────────────────────────────┤
-│                          (waiting)                  (waiting) │
-│                                │                            │
-└─ doctorStore.release()         │                            │
-│  Lock released                 │                            │
-├─────────────────────────────────┼────────────────────────────┤
-│                        ├─ doctorStore.getAll()              │
-│                        │  (returns consistent snapshot)    │
-│                        │                           ┌─ wait │
-│                        └─ List returned            │        │
-│                                                    │        │
-├─────────────────────────────────┼────────────────────────────┤
-│                                │                   ├─ Now executes
-│                                │                   │
-└────────────────────────────────┘───────────────────┘
+```bash
+-XX:+UnlockDiagnosticVMOptions -XX:+G1SummarizeConcMark -Xlog:gc*,safepoint:file=gc.log:time,level,tags
 ```
 
 ---
 
-## 5. Performance Characteristics
+## Concurrency & Threading
 
-### Startup Time
-
-```
-Phase                              Time
-──────────────────────────────────────────
-JVM Startup                        ~500 ms
-Class Loading (bootstrap)          ~100 ms
-Class Loading (application)        ~200 ms
-Object Initialization              ~100 ms
-First Appointment Creation         ~50 ms
-──────────────────────────────────────────
-Total Startup                      ~1000 ms (1 second)
-```
-
-### Operation Latencies
-
-```
-Operation                 Average     Worst Case
-──────────────────────────────────────────
-Register Doctor           < 1 ms      5 ms
-Register Patient          < 1 ms      5 ms
-Book Appointment          1-2 ms      10 ms
-Query by Specialty        1-2 ms      10 ms (100 doctors)
-Cancel Appointment        < 1 ms      5 ms
-Serialize to Disk         50-100 ms   500 ms (large data)
-```
-
-### Throughput
-
-**Single-Threaded:**
-- Register: ~1000 ops/sec
-- Query: ~100,000 ops/sec
-- Total: ~10,000 mixed ops/sec
-
-**Multi-Threaded (4 threads):**
-- Register: ~3000 ops/sec
-- Query: ~300,000 ops/sec
-- Total: ~30,000 mixed ops/sec
+- `DataStore` and services currently use thread-safe collections (e.g., `ConcurrentHashMap`, synchronized lists). This works well for the current load and simplifies correctness.  
+- If the application moves to higher concurrency, prefer fine-grained concurrency primitives (e.g., `ConcurrentHashMap`, `ReadWriteLock`) and minimize synchronized blocks.  
 
 ---
 
-## 6. Class Loading and Method Invocation
+## Profiling & Debugging Recommendations
 
-### Class Loading Process
+- For CPU/memory hotspots use:
+  - `jcmd <pid> JFR.start` / `jfr` recordings
+  - `jcmd GC.heap_info` and `jmap` heap dumps
+  - `jvisualvm` or `async-profiler` for flame graphs
 
-```
-1. Loading Phase
-   ├─ Class file found
-   ├─ Bytecode read into memory
-   └─ Class object created
-
-2. Linking Phase
-   ├─ Verification (bytecode validity)
-   ├─ Preparation (memory allocation)
-   └─ Resolution (symbol references)
-
-3. Initialization Phase
-   ├─ Static initializers run
-   ├─ Static fields initialized
-   └─ Class ready for use
-```
-
-### MediTrack Class Loading Order
-
-```
-Bootstrap Classes              Application Classes
-├─ java.lang.Object           ├─ Main
-├─ java.util.List             ├─ DoctorService
-├─ java.util.ArrayList        ├─ PatientService
-├─ java.lang.String           ├─ AppointmentService
-└─ Other JDK classes          ├─ Doctor
-                              ├─ Patient
-                              ├─ Appointment
-                              ├─ Constants
-                              ├─ IdGenerator
-                              └─ Other classes
-                              
-Time: ~100-200ms for app classes
-```
-
-### JIT Compilation
-
-```
-Invocation Count Strategy:
-
-Count  │  Behavior
-───────┼──────────────────────────────────
-  1    │  Interpreted
-  2    │  Interpreted
-  ...  │  ...
- 100   │  Interpreted (then PROFILE)
- ...   │  ...
-10000  │  JIT Compile to native code ✓
-       │
-       ├─ Method now runs in native machine code
-       ├─ ~10-100x faster than interpreted
-       └─ Inlining and optimization applied
-```
-
-**Affected Methods in MediTrack:**
-- `DataStore.findById()` - Hot loop
-- `DataStore.filter()` - Stream operations
-- Appointment validation
-- Revenue calculations
+- Capture a heap dump when memory approaches `-Xmx` and analyze retained sizes to find unexpected growth.
 
 ---
 
-## 7. Concurrency and Synchronization
+## Notes for Maintainers
 
-### Synchronization Overhead
+- The repository was streamlined: non-essential docs were pruned; essential docs remain in `docs/` (`Setup_Instructions.md`, `Design_Decisions.md`).  
+- Demo outputs and manual test runs are a quick smoke test before any production deployment.  
 
-```
-Uncontended Lock
-(No competing threads)
-├─ Cost: ~25 nanoseconds
-└─ Negligible impact
+---
 
-Contended Lock
-(Multiple threads competing)
-├─ Context switches: expensive
-├─ Cache invalidation
-├─ Memory barriers
-└─ Cost: microseconds to milliseconds
-```
-
-### DataStore Synchronization
-
-```java
-public synchronized void add(T entity) {
-    store.add(entity);
-}
-```
-
-**When called by multiple threads:**
-
-```
-Thread 1                Thread 2
-   ├─ enters monitor  │
-   │                  ├─ waits for lock
-   ├─ modifies list   │
-   │                  │
-   └─ releases lock   │
-                      ├─ acquires lock
+If you want, I can add a short `jcmd`/`jfr` script example and a sample GC log from a demo run.
                       ├─ modifies list
                       └─ releases lock
 ```

@@ -64,6 +64,11 @@ public class TestRunner {
         testAppointmentRetrieval();
         testCancelAppointment();
 
+        // Additional Appointment Tests (updated to match current implementation)
+        testMarkAppointmentCompleted();
+        testAddAppointmentNotes();
+        testGetAppointmentsByStatus();
+
         // Utility Tests
         testValidation();
         testIdGenerator();
@@ -146,7 +151,7 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 4, 15, 10, 0),
+                futureAppointmentTime(2, 10, 0),
                 "Test appointment"
             );
             return apt != null && apt.getId().startsWith("APT");
@@ -165,7 +170,7 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 5, 20, 14, 30),
+                futureAppointmentTime(3, 14, 30),
                 "Retrieval test"
             );
             Optional<Appointment> retrieved = appointmentService.getAppointmentById(apt.getId());
@@ -185,12 +190,83 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 6, 25, 11, 0),
+                futureAppointmentTime(4, 11, 0),
                 "Cancel test"
             );
             appointmentService.cancelAppointment(apt.getId());
             Optional<Appointment> cancelled = appointmentService.getAppointmentById(apt.getId());
             return cancelled.isPresent() && cancelled.get().getStatus().equals(AppointmentStatus.CANCELLED);
+        });
+    }
+
+    private static LocalDateTime futureAppointmentTime(int daysAhead, int hour, int minute) {
+        return LocalDateTime.now()
+            .plusDays(daysAhead)
+            .withHour(hour)
+            .withMinute(minute)
+            .withSecond(0)
+            .withNano(0);
+    }
+
+    private static void testMarkAppointmentCompleted() {
+        test("Mark Appointment Completed", () -> {
+            Doctor doctor = doctorService.registerDoctor(
+                "Dr. Complete", "complete@hospital.com", "9000000000",
+                "Test City", "General", "LIC200", 3
+            );
+            Patient patient = patientService.registerPatient(
+                "Complete Patient", "completepatient@email.com", "9110000000",
+                "Test City", LocalDate.of(1999, 9, 9), "Male", "O+"
+            );
+            Appointment apt = appointmentService.bookAppointment(
+                doctor.getId(), patient.getId(), futureAppointmentTime(1, 9, 0), "Complete test"
+            );
+            boolean updated = appointmentService.markAppointmentCompleted(apt.getId());
+            Optional<Appointment> retrieved = appointmentService.getAppointmentById(apt.getId());
+            return updated && retrieved.isPresent() && retrieved.get().getStatus().equals(AppointmentStatus.COMPLETED);
+        });
+    }
+
+    private static void testAddAppointmentNotes() {
+        test("Add Appointment Notes", () -> {
+            Doctor doctor = doctorService.registerDoctor(
+                "Dr. Notes", "notes@hospital.com", "9220000000",
+                "Test City", "General", "LIC201", 2
+            );
+            Patient patient = patientService.registerPatient(
+                "Notes Patient", "notespatient@email.com", "9330000000",
+                "Test City", LocalDate.of(1992, 2, 2), "Female", "A+"
+            );
+            Appointment apt = appointmentService.bookAppointment(
+                doctor.getId(), patient.getId(), futureAppointmentTime(2, 15, 0), "Notes test"
+            );
+            boolean updated = appointmentService.addAppointmentNotes(apt.getId(), "Patient showed symptoms");
+            Optional<Appointment> retrieved = appointmentService.getAppointmentById(apt.getId());
+            return updated && retrieved.isPresent() && retrieved.get().getNotes() != null && !retrieved.get().getNotes().isEmpty();
+        });
+    }
+
+    private static void testGetAppointmentsByStatus() {
+        test("Get Appointments by Status", () -> {
+            // Create confirmed and cancelled appointments
+            Doctor doctor = doctorService.registerDoctor(
+                "Dr. Status", "status@hospital.com", "9440000000",
+                "Test City", "General", "LIC202", 1
+            );
+            Patient patient = patientService.registerPatient(
+                "Status Patient", "statuspatient@email.com", "9550000000",
+                "Test City", LocalDate.of(1990, 4, 4), "Male", "B+"
+            );
+            Appointment apt1 = appointmentService.bookAppointment(doctor.getId(), patient.getId(), futureAppointmentTime(3, 10, 0), "Status1");
+            Appointment apt2 = appointmentService.bookAppointment(doctor.getId(), patient.getId(), futureAppointmentTime(4, 11, 0), "Status2");
+            // Cancel one
+            appointmentService.cancelAppointment(apt2.getId());
+            // Mark first as completed
+            appointmentService.markAppointmentCompleted(apt1.getId());
+            // Verify
+            int completed = appointmentService.getAppointmentsByStatus(AppointmentStatus.COMPLETED).size();
+            int cancelled = appointmentService.getAppointmentsByStatus(AppointmentStatus.CANCELLED).size();
+            return completed >= 1 && cancelled >= 1;
         });
     }
 

@@ -1,6 +1,6 @@
 package com.airtribe.meditrack.entity;
 
-import com.airtribe.meditrack.iface.Searchable;
+import com.airtribe.meditrack.interfaces.Searchable;
 import java.io.Serializable;
 
 /**

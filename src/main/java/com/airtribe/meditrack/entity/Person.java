@@ -1,35 +1,25 @@
 package com.airtribe.meditrack.entity;
 
-import com.airtribe.meditrack.iface.Searchable;
 import java.io.Serializable;
+import com.airtribe.meditrack.interfaces.Searchable;
 
 /**
  * Abstract base class for Person entities (Doctor and Patient).
  */
-public abstract class Person implements Searchable, Serializable {
+public abstract class Person extends MedicalEntity implements Searchable, Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected String id;
     protected String name;
     protected String email;
     protected String phoneNumber;
     protected String address;
 
     public Person(String id, String name, String email, String phoneNumber, String address) {
-        this.id = id;
+        super(id);
         this.name = name;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.address = address;
-    }
-
-    @Override
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getName() {

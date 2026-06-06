@@ -1,4 +1,4 @@
-package com.airtribe.meditrack.iface;
+package com.airtribe.meditrack.interfaces;
 
 /**
  * Searchable interface for entities that can be searched by ID.

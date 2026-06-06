@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,36 @@ public class PatientService {
     }
 
     /**
+     * Search a patient by ID.
+     * @param patientId the patient ID
+     * @return Optional containing the patient or empty
+     */
+    public Optional<Patient> searchPatient(String patientId) {
+        return getPatientById(patientId);
+    }
+
+    /**
+     * Search patients by name.
+     * @param name the name to search for
+     * @return list of matching patients
+     */
+    public List<Patient> searchPatient(String name, boolean searchByName) {
+        if (!searchByName) {
+            return List.of();
+        }
+        return searchPatientByName(name);
+    }
+
+    /**
+     * Search patients by age.
+     * @param age the age to search for
+     * @return list of matching patients
+     */
+    public List<Patient> searchPatient(int age) {
+        return searchPatientByAge(age);
+    }
+
+    /**
      * Get all patients.
      * @return list of all patients
      */
@@ -81,6 +112,26 @@ public class PatientService {
      */
     public List<Patient> getPatientsByBloodGroup(String bloodGroup) {
         return patientStore.filter(patient -> patient.getBloodGroup().equalsIgnoreCase(bloodGroup));
+    }
+
+    /**
+     * Search patients by name.
+     * @param name the name to search for
+     * @return list of matching patients
+     */
+    public List<Patient> searchPatientByName(String name) {
+        return patientStore.filter(patient -> patient.getName() != null
+                && patient.getName().toLowerCase().contains(name.toLowerCase()));
+    }
+
+    /**
+     * Search patients by age.
+     * @param age the age to search for
+     * @return list of matching patients
+     */
+    public List<Patient> searchPatientByAge(int age) {
+        return patientStore.filter(patient -> patient.getDateOfBirth() != null
+                && Period.between(patient.getDateOfBirth(), LocalDate.now()).getYears() == age);
     }
 
     /**

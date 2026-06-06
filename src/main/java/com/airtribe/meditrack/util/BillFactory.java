@@ -1,7 +1,7 @@
 package com.airtribe.meditrack.util;
 
 import com.airtribe.meditrack.entity.Bill;
-import com.airtribe.meditrack.iface.BillingStrategy;
+import com.airtribe.meditrack.interfaces.BillingStrategy;
 
 /**
  * Factory pattern implementation for creating different bill types with strategies.

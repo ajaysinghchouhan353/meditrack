@@ -1,4 +1,5 @@
 package com.airtribe.meditrack;
+import com.airtribe.meditrack.constants.Constants;
 import com.airtribe.meditrack.entity.Appointment;
 import com.airtribe.meditrack.entity.Bill;
 import com.airtribe.meditrack.entity.Doctor;
@@ -15,6 +16,8 @@ import com.airtribe.meditrack.util.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,9 +38,13 @@ public class Main {
     private static BillService billService;
     private static NotificationService notificationService;
     private static Scanner scanner;
+    private static DataStore<Doctor> doctorStore;
+    private static DataStore<Patient> patientStore;
+    private static DataStore<Appointment> appointmentStore;
+    private static DataStore<Bill> billStore;
 
     public static void main(String[] args) {
-        initializeServices();
+        initializeServices(args);
 
         if (args.length > 0 && "--demo".equalsIgnoreCase(args[0])) {
             runDemo();
@@ -47,11 +54,15 @@ public class Main {
         runMenu();
     }
 
-    private static void initializeServices() {
-        DataStore<Doctor> doctorStore = new DataStore<>();
-        DataStore<Patient> patientStore = new DataStore<>();
-        DataStore<Appointment> appointmentStore = new DataStore<>();
-        DataStore<Bill> billStore = new DataStore<>();
+    private static void initializeServices(String[] args) {
+        doctorStore = new DataStore<>();
+        patientStore = new DataStore<>();
+        appointmentStore = new DataStore<>();
+        billStore = new DataStore<>();
+
+        if (hasArgument(args, "--loadData")) {
+            loadPersistedData(doctorStore, patientStore, appointmentStore, billStore);
+        }
 
         notificationService = new NotificationService();
         notificationService.registerListener(new ConsoleNotificationListener());
@@ -66,6 +77,78 @@ public class Main {
         );
         billService = new BillService(billStore, appointmentService);
         scanner = new Scanner(System.in);
+    }
+
+    private static boolean hasArgument(String[] args, String target) {
+        for (String arg : args) {
+            if (target.equalsIgnoreCase(arg)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static void loadPersistedData(DataStore<Doctor> doctorStore, DataStore<Patient> patientStore,
+                                          DataStore<Appointment> appointmentStore, DataStore<Bill> billStore) {
+        try {
+            doctorStore.deserialize(Constants.DOCTORS_DATA_FILE);
+            logger.info("Loaded doctors from {}", Constants.DOCTORS_DATA_FILE);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.warn("Could not load doctors from {}: {}", Constants.DOCTORS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            patientStore.deserialize(Constants.PATIENTS_DATA_FILE);
+            logger.info("Loaded patients from {}", Constants.PATIENTS_DATA_FILE);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.warn("Could not load patients from {}: {}", Constants.PATIENTS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            appointmentStore.deserialize(Constants.APPOINTMENTS_DATA_FILE);
+            logger.info("Loaded appointments from {}", Constants.APPOINTMENTS_DATA_FILE);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.warn("Could not load appointments from {}: {}", Constants.APPOINTMENTS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            billStore.deserialize(Constants.BILLS_DATA_FILE);
+            logger.info("Loaded bills from {}", Constants.BILLS_DATA_FILE);
+        } catch (IOException | ClassNotFoundException ex) {
+            logger.warn("Could not load bills from {}: {}", Constants.BILLS_DATA_FILE, ex.getMessage());
+        }
+    }
+
+    private static void savePersistedData() {
+        new File(Constants.DATA_DIRECTORY).mkdirs();
+
+        try {
+            doctorStore.serialize(Constants.DOCTORS_DATA_FILE);
+            logger.info("Saved doctors to {}", Constants.DOCTORS_DATA_FILE);
+        } catch (IOException ex) {
+            logger.warn("Could not save doctors to {}: {}", Constants.DOCTORS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            patientStore.serialize(Constants.PATIENTS_DATA_FILE);
+            logger.info("Saved patients to {}", Constants.PATIENTS_DATA_FILE);
+        } catch (IOException ex) {
+            logger.warn("Could not save patients to {}: {}", Constants.PATIENTS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            appointmentStore.serialize(Constants.APPOINTMENTS_DATA_FILE);
+            logger.info("Saved appointments to {}", Constants.APPOINTMENTS_DATA_FILE);
+        } catch (IOException ex) {
+            logger.warn("Could not save appointments to {}: {}", Constants.APPOINTMENTS_DATA_FILE, ex.getMessage());
+        }
+
+        try {
+            billStore.serialize(Constants.BILLS_DATA_FILE);
+            logger.info("Saved bills to {}", Constants.BILLS_DATA_FILE);
+        } catch (IOException ex) {
+            logger.warn("Could not save bills to {}: {}", Constants.BILLS_DATA_FILE, ex.getMessage());
+        }
     }
 
     private static void runMenu() {
@@ -107,6 +190,7 @@ public class Main {
         }
 
         scanner.close();
+        savePersistedData();
         logger.info("Application closed. Goodbye from MediTrack.");
     }
 
@@ -128,7 +212,7 @@ public class Main {
     }
 
     private static void handleDoctors() throws InvalidDataException {
-        System.out.println("\nDoctor Menu: 1) Register 2) List 3) Search");
+        System.out.println("\nDoctor Menu: 1) Register 2) List 3) Search by ID 4) Search by Specialty");
         String choice = scanner.nextLine().trim();
 
         switch (choice) {
@@ -171,13 +255,23 @@ public class Main {
                     logger.warn("Doctor not found for ID: " + doctorId);
                 }
                 break;
+            case "4":
+                System.out.print("Specialty: ");
+                String specialtySearch = scanner.nextLine();
+                List<Doctor> matchingDoctors = doctorService.getDoctorsBySpecialty(specialtySearch);
+                if (matchingDoctors.isEmpty()) {
+                    logger.warn("No doctors found for specialty: " + specialtySearch);
+                } else {
+                    matchingDoctors.forEach(foundDoctor -> logger.info("Doctor found: " + foundDoctor));
+                }
+                break;
             default:
                 logger.warn("Invalid doctor menu option: " + choice);
         }
     }
 
     private static void handlePatients() throws InvalidDataException {
-        System.out.println("\nPatient Menu: 1) Register 2) List 3) Search");
+        System.out.println("\nPatient Menu: 1) Register 2) List 3) Search by ID 4) Search by Name 5) Search by Age");
         String choice = scanner.nextLine().trim();
 
         switch (choice) {
@@ -218,6 +312,26 @@ public class Main {
                     logger.info("Patient found: " + p.get());
                 } else {
                     logger.warn("Patient not found for ID: " + patientId);
+                }
+                break;
+            case "4":
+                System.out.print("Patient Name: ");
+                String patientName = scanner.nextLine();
+                List<Patient> matchingPatientsByName = patientService.searchPatientByName(patientName);
+                if (matchingPatientsByName.isEmpty()) {
+                    logger.warn("No patients found for name: " + patientName);
+                } else {
+                    matchingPatientsByName.forEach(foundPatient -> logger.info("Patient found: " + foundPatient));
+                }
+                break;
+            case "5":
+                System.out.print("Age: ");
+                int age = Integer.parseInt(scanner.nextLine().trim());
+                List<Patient> matchingPatientsByAge = patientService.searchPatientByAge(age);
+                if (matchingPatientsByAge.isEmpty()) {
+                    logger.warn("No patients found for age: " + age);
+                } else {
+                    matchingPatientsByAge.forEach(foundPatient -> logger.info("Patient found: " + foundPatient));
                 }
                 break;
             default:
@@ -348,6 +462,7 @@ public class Main {
             logger.info("Demo Summary - Patients: " + patientService.getTotalPatients());
             logger.info("Demo Summary - Appointments: " + appointmentService.getTotalAppointments());
             logger.info("Demo Summary - Bills: " + billService.getTotalBills());
+            savePersistedData();
         } catch (InvalidDataException | AppointmentNotFoundException ex) {
             logger.error("Demo failed with exception: " + ex.getMessage(), ex);
         }
