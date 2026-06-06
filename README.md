@@ -10,7 +10,7 @@
 
 - Version `1.0.0` release: core functionality implemented and verified.
 - Major updates: consolidated interface package (`com.airtribe.meditrack.interfaces`), added comprehensive demos, improved persistence and reporting.
-- Demo output captured: see `docs/DEMO_OUTPUT.md` for the full run of `DemoRunner` (appointments, billing, notifications, persistence, and pattern showcase).
+-- Demo output: run `com.airtribe.meditrack.demo.DemoRunner` locally to capture demo output (not included in repository).
 
 
 ## 📋 Table of Contents
