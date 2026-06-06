@@ -6,6 +6,13 @@
 
 ---
 
+## 📝 Release Notes (June 6, 2026)
+
+- Version `1.0.0` release: core functionality implemented and verified.
+- Major updates: consolidated interface package (`com.airtribe.meditrack.interfaces`), added comprehensive demos, improved persistence and reporting.
+- Demo output captured: see `docs/DEMO_OUTPUT.md` for the full run of `DemoRunner` (appointments, billing, notifications, persistence, and pattern showcase).
+
+
 ## 📋 Table of Contents
 - [Overview](#overview)
 - [Features](#features)
