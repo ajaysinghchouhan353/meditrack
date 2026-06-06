@@ -523,7 +523,7 @@ com.airtribe.meditrack
 ├── exception/                   # Custom exceptions
 │   ├── AppointmentNotFoundException.java
 │   └── InvalidDataException.java
-├── iface/                       # Interface definitions
+├── interfaces/                  # Interface definitions
 │   ├── Searchable.java
 │   ├── Payable.java
 │   ├── BillingStrategy.java
