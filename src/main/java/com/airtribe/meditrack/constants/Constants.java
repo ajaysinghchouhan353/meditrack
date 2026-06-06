@@ -1,9 +1,25 @@
 package com.airtribe.meditrack.constants;
 
+import java.io.File;
+
 /**
  * Constants for the MediTrack application.
  */
 public final class Constants {
+    public static final String DATA_DIRECTORY;
+    public static final String DOCTORS_DATA_FILE;
+    public static final String PATIENTS_DATA_FILE;
+    public static final String APPOINTMENTS_DATA_FILE;
+    public static final String BILLS_DATA_FILE;
+
+    static {
+        DATA_DIRECTORY = "data";
+        DOCTORS_DATA_FILE = DATA_DIRECTORY + File.separator + "doctors.ser";
+        PATIENTS_DATA_FILE = DATA_DIRECTORY + File.separator + "patients.ser";
+        APPOINTMENTS_DATA_FILE = DATA_DIRECTORY + File.separator + "appointments.ser";
+        BILLS_DATA_FILE = DATA_DIRECTORY + File.separator + "bills.ser";
+    }
+
     private Constants() {
         // Private constructor to prevent instantiation
     }

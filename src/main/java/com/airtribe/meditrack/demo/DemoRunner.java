@@ -14,6 +14,7 @@ import com.airtribe.meditrack.service.ConsoleNotificationListener;
 import com.airtribe.meditrack.service.DoctorService;
 import com.airtribe.meditrack.service.NotificationService;
 import com.airtribe.meditrack.service.PatientService;
+import com.airtribe.meditrack.util.AppointmentAnalyticsReport;
 import com.airtribe.meditrack.util.DataStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -573,6 +574,15 @@ public class DemoRunner {
         printInfo("  ✓ Final class with no setters");
         printInfo("  ✓ Thread-safe and cacheable");
         printInfo("  → Data transfer without side effects");
+
+        printInfo("\n8.7 Template Method Pattern (AppointmentAnalyticsReport)");
+        AppointmentAnalyticsReport report = new AppointmentAnalyticsReport(
+            appointmentService.getTotalAppointments(),
+            appointmentService.getTotalBookedAppointments(),
+            appointmentService.getAppointmentsByStatus(AppointmentStatus.COMPLETED).size(),
+            appointmentService.getAppointmentsByStatus(AppointmentStatus.CANCELLED).size()
+        );
+        printInfo(report.generate().replace("\n", "\n  "));
     }
 
     /**

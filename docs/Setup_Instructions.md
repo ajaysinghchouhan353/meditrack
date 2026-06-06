@@ -261,6 +261,20 @@ mvn clean install -DskipTests
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main"
 ```
 
+### Restore Saved Data
+
+If you have previously saved data files under `data/`, load them on startup with:
+
+```bash
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--loadData"
+```
+
+### Demo Mode
+
+```bash
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--demo"
+```
+
 ### Option 2: Build JAR and Run
 
 ```bash
@@ -301,8 +315,8 @@ mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.test.TestRunner"
 =====================================
   TEST SUMMARY
 =====================================
-Total Tests: 20
-Passed: 20
+Total Tests: 15
+Passed: 15
 Failed: 0
 Success Rate: 100%
 ```

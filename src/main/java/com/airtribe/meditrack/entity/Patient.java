@@ -62,11 +62,18 @@ public class Patient extends Person implements Cloneable {
      * @return a shallow copy
      */
     public Patient shallowCopy() {
-        try {
-            return (Patient) super.clone();
-        } catch (CloneNotSupportedException e) {
-            throw new RuntimeException("Shallow copy failed", e);
-        }
+        Patient copy = new Patient(
+            getId(),
+            getName(),
+            getEmail(),
+            getPhoneNumber(),
+            getAddress(),
+            dateOfBirth,
+            gender,
+            bloodGroup
+        );
+        copy.medicalHistory = medicalHistory;
+        return copy;
     }
 
     /**
@@ -76,14 +83,17 @@ public class Patient extends Person implements Cloneable {
      */
     @Override
     public Patient clone() throws CloneNotSupportedException {
-        Patient cloned = (Patient) super.clone();
-        
-        // Deep copy of immutable objects (LocalDate is immutable, but good practice)
-        // LocalDate.clone() not needed as LocalDate is immutable
-        // For String - also immutable
-        // For medicalHistory - create new String to be safe
+        Patient cloned = new Patient(
+            getId(),
+            getName(),
+            getEmail(),
+            getPhoneNumber(),
+            getAddress(),
+            dateOfBirth,
+            gender,
+            bloodGroup
+        );
         cloned.medicalHistory = new String(this.medicalHistory);
-        
         return cloned;
     }
 

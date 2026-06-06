@@ -1,6 +1,6 @@
 package com.airtribe.meditrack.entity;
 
-import com.airtribe.meditrack.iface.Searchable;
+import com.airtribe.meditrack.interfaces.Searchable;
 import com.airtribe.meditrack.constants.AppointmentStatus;
 import java.io.Serializable;
 import java.time.LocalDateTime;

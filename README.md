@@ -2,7 +2,7 @@
 
 > A professional-grade **Clinic & Appointment Management System** demonstrating enterprise Java architecture, advanced OOP principles, design patterns, and modern Java 17 features.
 
-**Version**: 1.0.0 | **Java**: 17 LTS | **Status**: ✅ Production Ready | **Last Updated**: March 5, 2026
+**Version**: 1.0.0 | **Java**: 17 LTS | **Status**: ✅ Production Ready | **Last Updated**: June 6, 2026
 
 ---
 
@@ -97,10 +97,13 @@ mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.demo.DemoRunner"
 # 5. Run interactive menu
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main"
 
-# 6. Or run with demo mode
+# 6. Load saved data on startup
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--loadData"
+
+# 7. Or run with demo mode
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--demo"
 
-# 7. Run manual tests
+# 8. Run manual tests
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.test.TestRunner"
 ```
 
@@ -180,7 +183,7 @@ meditrack/ (Root)
 │   │   └── Specialization.java            └─ Medical specialization enum
 │   │
 │   ├── enums/                             ← Type-safe enums
-│   │   └── Specialization.java            └─ 8 medical specialties
+│   │   └── (reserved for future enums)
 │   │
 │   └── test/                              ← Test suite (1 class)
 │       └── TestRunner.java                └─ Manual tests (20+ test cases)
@@ -191,13 +194,12 @@ meditrack/ (Root)
 │   ├── Setup_Instructions.md              ├─ Environment setup guide
 │   ├── JVM_Report.md                      ├─ JVM analysis & performance
 │   ├── Design_Decisions.md                ├─ Architecture decisions
-│   ├── README.md                          └─ Main documentation (legacy)
+│   ├── REQUIREMENTS_VERIFICATION.md       ├─ Requirements traceability
+│   ├── REQUIREMENTS_CHECKLIST.md          ├─ Quick validation checklist
+│   ├── RUNTIME_FIX_GUIDE.md               └─ Runtime troubleshooting
 │
 ├── pom.xml                                ← Maven configuration
 ├── README.md                              ← This file
-├── REQUIREMENTS_VERIFICATION.md           ← Detailed requirements analysis
-├── REQUIREMENTS_CHECKLIST.md              ← Quick verification checklist
-├── RUNTIME_FIX_GUIDE.md                   ← Troubleshooting guide
 └── .gitignore                             ← Git ignore rules
 
 Total: 35+ Java classes | ~2,500+ lines of code | 0 compile errors
@@ -364,7 +366,7 @@ reminderTimer.schedule(new TimerTask() { ... }, delay);
 | **Factory** | `BillFactory.java` | Create bills with appropriate strategies |
 | **Strategy** | `BillingStrategy.java` + 4 implementations | Multiple billing algorithms |
 | **Observer** | `NotificationService.java` | Notify listeners of appointment events |
-| **Template Method** | `MedicalEntity.java` | Common behavior in base class |
+| **Template Method** | `AbstractReportTemplate.java` | Common report workflow in base class |
 | **Generic Repository** | `DataStore<T>` | Type-safe data access |
 | **Service Layer** | `*Service.java` classes | Encapsulate business logic |
 

@@ -146,7 +146,7 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 4, 15, 10, 0),
+                futureAppointmentTime(2, 10, 0),
                 "Test appointment"
             );
             return apt != null && apt.getId().startsWith("APT");
@@ -165,7 +165,7 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 5, 20, 14, 30),
+                futureAppointmentTime(3, 14, 30),
                 "Retrieval test"
             );
             Optional<Appointment> retrieved = appointmentService.getAppointmentById(apt.getId());
@@ -185,13 +185,22 @@ public class TestRunner {
             );
             Appointment apt = appointmentService.bookAppointment(
                 doctor.getId(), patient.getId(),
-                LocalDateTime.of(2026, 6, 25, 11, 0),
+                futureAppointmentTime(4, 11, 0),
                 "Cancel test"
             );
             appointmentService.cancelAppointment(apt.getId());
             Optional<Appointment> cancelled = appointmentService.getAppointmentById(apt.getId());
             return cancelled.isPresent() && cancelled.get().getStatus().equals(AppointmentStatus.CANCELLED);
         });
+    }
+
+    private static LocalDateTime futureAppointmentTime(int daysAhead, int hour, int minute) {
+        return LocalDateTime.now()
+            .plusDays(daysAhead)
+            .withHour(hour)
+            .withMinute(minute)
+            .withSecond(0)
+            .withNano(0);
     }
 
     private static void testValidation() {

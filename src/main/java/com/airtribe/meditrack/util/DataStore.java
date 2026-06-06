@@ -1,6 +1,6 @@
 package com.airtribe.meditrack.util;
 
-import com.airtribe.meditrack.iface.Searchable;
+import com.airtribe.meditrack.interfaces.Searchable;
 import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;

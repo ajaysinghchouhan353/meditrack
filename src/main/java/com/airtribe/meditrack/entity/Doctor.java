@@ -74,6 +74,22 @@ public class Doctor extends Person {
     }
 
     @Override
+    public Doctor clone() throws CloneNotSupportedException {
+        Doctor clonedDoctor = new Doctor(
+                getId(),
+                getName(),
+                getEmail(),
+                getPhoneNumber(),
+                getAddress(),
+                specialty,
+                licenseNumber,
+                yearsOfExperience
+        );
+        clonedDoctor.setAvailable(available);
+        return clonedDoctor;
+    }
+
+    @Override
     public String toString() {
         return "Doctor{" +
                 "id='" + id + '\'' +

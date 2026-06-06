@@ -1,8 +1,8 @@
 package com.airtribe.meditrack.entity;
 
-import com.airtribe.meditrack.iface.Payable;
-import com.airtribe.meditrack.iface.Searchable;
-import com.airtribe.meditrack.iface.BillingStrategy;
+import com.airtribe.meditrack.interfaces.Payable;
+import com.airtribe.meditrack.interfaces.Searchable;
+import com.airtribe.meditrack.interfaces.BillingStrategy;
 import java.io.Serializable;
 import java.time.LocalDate;
 
