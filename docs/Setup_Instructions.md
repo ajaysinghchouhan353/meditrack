@@ -177,34 +177,32 @@
 ### 1. Create Project Directory
 
 ```bash
-# Create a workspace directory
+# Create a workspace directory (example)
 mkdir -p ~/Projects
 cd ~/Projects
 ```
 
 ### 2. Clone Repository
 
+Replace `yourusername` with your GitHub account or use the repository URL used in this workspace:
+
 ```bash
-git clone https://github.com/yourusername/meditrack.git
+git clone https://github.com/ajaysinghchouhan353/meditrack.git
 cd meditrack
 ```
 
-Or if no remote repository:
-```bash
-# Already in project directory
-cd meditrack
-```
+If you are already inside the project folder, just `cd` to it.
 
 ### 3. Verify Project Structure
 
 ```bash
 # List directory structure
 ls -la          # macOS/Linux
-dir /s          # Windows
+dir /a          # Windows (shows hidden files)
 
-# Should see:
+# Expected top-level files and folders:
 # ├── src/
-# ├── docs/
+# ├── docs/        (essential docs retained: Setup_Instructions.md, DEMO_OUTPUT.md, Design_Decisions.md)
 # ├── pom.xml
 # ├── README.md
 # └── .gitignore
@@ -253,42 +251,58 @@ mvn clean install -DskipTests
 
 ---
 
-## Step 6: Run the Application
+## Step 6: Run the Application (and Demos)
 
-### Option 1: Using Maven
+This project includes two demo entrypoints for quick verification:
+
+- `com.airtribe.meditrack.demo.QuickDemo` — 60-second quick overview
+- `com.airtribe.meditrack.demo.DemoRunner` — comprehensive feature demo
+
+### Run Quick Demo
+
+```bash
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.demo.QuickDemo"
+```
+
+### Run Comprehensive Demo
+
+```bash
+mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.demo.DemoRunner"
+```
+
+### Run Interactive Application (Main)
 
 ```bash
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main"
 ```
 
-### Restore Saved Data
+Pass runtime args to `Main` as needed:
 
-If you have previously saved data files under `data/`, load them on startup with:
+- Load saved data on startup:
 
 ```bash
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--loadData"
 ```
 
-### Demo Mode
+- Start in demo mode:
 
 ```bash
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--demo"
 ```
 
-### Option 2: Build JAR and Run
+### Build and Run JAR
+
+Create a packaged JAR (project `pom.xml` controls artifactId/version):
 
 ```bash
-# Create executable JAR
 mvn clean package
-
-# Run the JAR
 java -jar target/meditrack-1.0.0.jar
 ```
 
-### Option 3: Create Fat JAR (with dependencies)
+If you prefer a single 'fat' JAR including dependencies, use the Maven Shade or Assembly plugin (project may already include assembly/shade config):
 
 ```bash
-mvn clean compile assembly:single
+mvn clean package assembly:single
 java -jar target/meditrack-1.0.0-jar-with-dependencies.jar
 ```
 
@@ -363,6 +377,8 @@ mvn test
 4. Run Application:
    - Press `Ctrl+Shift+D` → Choose Java
    - Or use: `mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main"`
+
+   **Note:** Interfaces package was consolidated to `com.airtribe.meditrack.interfaces`. If you modified package names locally, re-import the project in your IDE.
 
 ---
 
