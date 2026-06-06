@@ -398,6 +398,52 @@ reminderTimer.schedule(new TimerTask() { ... }, delay);
 | **Generic Repository** | `DataStore<T>` | Type-safe data access |
 | **Service Layer** | `*Service.java` classes | Encapsulate business logic |
 
+---
+
+## 🧪 Testing
+
+- Automated tests (JUnit / Surefire):
+
+```bash
+# Run the automated test suite
+mvn -q clean test
+```
+
+- Manual test harness (`TestRunner`):
+
+```bash
+# Run the TestRunner via Maven exec (manual harness)
+mvn -Dexec.mainClass=com.airtribe.meditrack.test.TestRunner org.codehaus.mojo:exec-maven-plugin:3.1.0:java
+
+# Or run from the assembled fat JAR (recommended for repeatable runs)
+java -cp target/meditrack-1.0.0-jar-with-dependencies.jar com.airtribe.meditrack.test.TestRunner
+```
+
+- Current manual test results (last run): **18/18 passed**. The `TestRunner` file is `src/main/java/com/airtribe/meditrack/test/TestRunner.java`.
+
+---
+
+## 📚 Build & Documentation
+
+- Build and assemble a runnable JAR (with dependencies):
+
+```bash
+# Produces: target/meditrack-1.0.0-jar-with-dependencies.jar
+mvn -q clean package assembly:single
+```
+
+- JavaDoc (API docs):
+
+```bash
+# Generate JavaDoc site
+mvn javadoc:javadoc
+# View: target/site/apidocs/index.html
+```
+
+- Artifacts & helper scripts:
+    - `run-demo.bat` — Windows helper: builds the fat JAR if missing and runs demo (`--demo`).
+    - Assembled JAR: `target/meditrack-1.0.0-jar-with-dependencies.jar` (after assembly).
+
 ### Pattern Examples
 
 **Singleton Pattern** (Double-Checked Locking):
