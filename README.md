@@ -114,6 +114,27 @@ mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.Main" -Dexec.args="--demo
 mvn exec:java -Dexec.mainClass="com.airtribe.meditrack.test.TestRunner"
 ```
 
+### Packaging (runnable fat JAR)
+
+Build an executable jar with dependencies (assembly):
+
+```bash
+# Produces: target/meditrack-1.0.0-jar-with-dependencies.jar
+mvn -q clean package assembly:single
+```
+
+Run the assembled JAR (demo mode):
+
+```bash
+java -jar target/meditrack-1.0.0-jar-with-dependencies.jar --demo
+```
+
+On Windows you can use the included `run-demo.bat` which builds the JAR if missing and runs the demo:
+
+```powershell
+.\run-demo.bat
+```
+
 **Expected Output**:
 ```
 ========================================
